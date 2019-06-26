@@ -19,6 +19,7 @@ rl.prompt();
 //handle user input
 rl.on('line', input => {
   if (!repo.owner) {
+    
     //first input for repo owner
     repo.owner = input;
     
@@ -27,22 +28,43 @@ rl.on('line', input => {
     
     //prompt user again
     rl.prompt();
+
   } else if (!repo.name) {
+    
     //second input for repo name
     repo.name = input;
 
-    //now make a GET request to GitHub API
+    //change prompt to ask for number of weeks of repo history
+    rl.setPrompt('enter the number of weeks of history you want to see (press enter to default to 1 year) (number must be between 1 and 52): ');
+
+    //prompt user again
+    rl.prompt();
+
+  } else if (!repo.weeks) {
+
+    //check if the default value was chosen. if it wasn't, check if it is a valid input. if it is, set that number of weeks.
+    if (!input) {
+      repo.weeks = 52;
+    } else if (input < 1 || input > 52) {
+      throw new Error('please enter a number of weeks between 1 and 52 (inclusive)');
+    } else {
+      repo.weeks = input;
+    }
+
+    //now make a GET request to the GitHub API
     axios.get(`https://api.github.com/repos/${repo.owner}/${repo.name}/stats/commit_activity`)
       .then(response => {
-        let dayCommits = [0, 0, 0, 0, 0, 0, 0];
 
+        //initialize commit counter array
+        let dayCommits = [0, 0, 0, 0, 0, 0, 0];
+  
         //count the total number of commits for each day of the week over the last year
         for (let i = 0; i < days.length; i++) {
-          for (let j = 0; j < response.data.length; j++) {
+          for (let j = 0; j < repo.weeks; j++) {
             dayCommits[i] += response.data[j].days[i];
           }
         }
-
+  
         return dayCommits;
       })
       .then(dayCommits => {
@@ -51,11 +73,11 @@ rl.on('line', input => {
         
         //find the day of the week with the most commits
         const mostCommittedDay = days[dayCommits.indexOf(mostCommitsOnADayOfWeek)];
-
+  
         //output the findings to the user
-        console.log(`\n${mostCommittedDay} has had the most commits, ${mostCommitsOnADayOfWeek}, over the last year.`);
-        console.log(`On average, about ${(mostCommitsOnADayOfWeek/52).toFixed(2)} commits were made on every ${mostCommittedDay} over the last year.`);
-
+        console.log(`\n${mostCommittedDay} has had the most commits, ${mostCommitsOnADayOfWeek}, over the last ${repo.weeks} weeks.`);
+        console.log(`On average, about ${(mostCommitsOnADayOfWeek/`${repo.weeks}`).toFixed(2)} commits were made on every ${mostCommittedDay} over the last ${repo.weeks} weeks.`);
+  
         //return to the command line
         process.exit();
       })
