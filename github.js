@@ -55,7 +55,7 @@ rl.on('line', input => {
     //check if the default value was chosen. if it wasn't, check if it is a valid input. if it is, set that number of weeks.
     if (!input) {
       repo.weeks = 52;
-    } else if (input < 1 || input > 52) {
+    } else if (!parseInt(input) || input < 1 || input > 52) {
       throw new Error('please enter a number of weeks between 1 and 52 (inclusive)');
     } else {
       repo.weeks = input;
@@ -81,6 +81,12 @@ rl.on('line', input => {
     //now make a GET request to the GitHub API
     axios.get(`https://api.github.com/repos/${repo.owner}/${repo.name}/stats/commit_activity`)
       .then(response => {
+
+        //check for 202 response code and handle appropriately
+        if (response.status === 202) {
+          console.log('\nThe stats are being compiled for the first time now. Please try again in a moment.');
+          process.exit();
+        }
 
         //initialize commit counter object
         let dayCommits = {};
@@ -121,7 +127,12 @@ rl.on('line', input => {
       })
       .catch(error => {
         //handle any errors
-        throw new Error(error);
+        if (error.response.status === 404) {
+          console.log('\nThat repo was not found. Please check your spelling and try again.');
+        } else {
+          console.log(error);
+        }
+        process.exit();
       });
   }
 });
