@@ -128,7 +128,7 @@ rl.on('line', input => {
       .catch(error => {
         //handle any errors
         if (error.response.status === 404) {
-          console.log('\nThat repo was not found. Please check your spelling and try again.');
+          console.log(`\n${repo.owner}/${repo.name} was not found. Please check your spelling and try again.`);
         } else {
           console.log(error);
         }
