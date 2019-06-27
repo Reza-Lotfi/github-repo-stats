@@ -1,4 +1,4 @@
-Hi Ask Media Group Hiring Team!
+Hi curious reader!
 
 **INSTRUCTIONS**
 
@@ -15,7 +15,5 @@ Hi Ask Media Group Hiring Team!
 - In other words, if you try to get stats about a repo and get 0 commits back, please try again after a few moments. I tested my code many times throughout development and only ran into this issue when querying a repo for the first time.
 
 - I'm aware I could have used the built-in http module in the standard node library, but I wanted my code to be more readable.
-
-- I didn't do the bonus objectives because I wanted to get this assignment back to you all as quickly as possible. I believe in completing an MVP first before attempting any extras. I'll work on completing the bonuses as soon as I send this over.
 
 - I hope you all like my work! :)
